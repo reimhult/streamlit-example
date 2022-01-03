@@ -7,9 +7,7 @@ Created on Wed Dec 29 13:42:12 2021
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import streamlit as st
-import scipy.signal as ss
 import altair as alt
 
 st.sidebar.header('Input signal')
