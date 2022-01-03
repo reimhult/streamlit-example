@@ -1,43 +1,63 @@
-from collections import namedtuple
-import altair as alt
-import math
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec 29 13:42:12 2021
+
+@author: Daniel
+"""
+
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import streamlit as st
+import scipy.signal as ss
+import altair as alt
 
-"""
-# Welcome to Streamlit!
+st.sidebar.header('Input signal')
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
+frequency = st.sidebar.slider('Frequency (Hz)', min_value=1, max_value=100, value=10)
+input_sample_rate = st.sidebar.slider('Sample rate (Hz)', min_value=10, max_value=1000, value=200)
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+num_seconds = 1
+num_samples = num_seconds * input_sample_rate
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+upsampling_rate = 2
+downsampling_rate = 5
 
+spectral_components = [{'frequency': frequency, 'amplitude': 1, 'phase': 0}]
 
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+time = np.arange(num_samples) / input_sample_rate
 
-    df_random = pd.DataFrame(np.random.normal(0, 1.0, size=(total_points, 1)))
+output_sample_rate = input_sample_rate * upsampling_rate // downsampling_rate
 
-    st.text(df_random.head())
+input_signal = np.zeros(num_samples)
 
-    Point = namedtuple('Point', 'x y')
-    data = []
+for sc in spectral_components:
+    input_signal += sc['amplitude'] * np.sin( 2*np.pi*sc['frequency']*time + sc['phase'] * np.pi / 180.0 )
 
-    points_per_turn = total_points / num_turns
+df_input = pd.DataFrame({'Input signal': input_signal, 'time': time})
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
+input_chart = alt.Chart(df_input).mark_line().encode(
+    x='time',
+    y='Input signal'
+)    
 
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+st.altair_chart(input_chart, use_container_width=True)
+
+input_spectrum = np.abs(np.fft.fft(input_signal))[:num_samples//2] / (num_samples//2)
+frequencies = np.fft.fftfreq(num_samples, 1 / input_sample_rate)[:num_samples//2]
+
+df_spectrum = pd.DataFrame({'Amplitude spectrum': input_spectrum, 'Frequency (Hz)': frequencies})
+
+spectrum_chart = alt.Chart(df_spectrum).mark_line().encode(
+    x='Frequency (Hz)',
+    y='Amplitude spectrum'
+)    
+
+st.altair_chart(spectrum_chart, use_container_width=True)
+
+max_index = np.argmax(input_spectrum)
+det_freq = frequencies[max_index]
+
+st.text(f'Input signal frequency: {frequency:.2f} Hz')
+st.text(f'Detected frequency: {det_freq:.2f} Hz')
+
