@@ -10,10 +10,10 @@ import pandas as pd
 import streamlit as st
 import altair as alt
 
-st.sidebar.header('Input signal')
+st.header('Input signal')
 
-frequency = st.sidebar.slider('Frequency (Hz)', min_value=1, max_value=100, value=10)
-input_sample_rate = st.sidebar.slider('Sample rate (Hz)', min_value=10, max_value=1000, value=200)
+frequency = st.slider('Frequency (Hz)', min_value=1, max_value=100, value=10)
+input_sample_rate = st.slider('Sample rate (Hz)', min_value=10, max_value=1000, value=200)
 
 num_seconds = 1
 num_samples = num_seconds * input_sample_rate
