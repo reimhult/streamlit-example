@@ -17,9 +17,9 @@ hide_decoration_bar_style = '''
 '''
 st.markdown(hide_decoration_bar_style, unsafe_allow_html=True)
 
-st.header('Input signal')
+st.header('Aliasing')
 
-frequency = st.slider('Frequency (Hz)', min_value=1, max_value=100, value=10)
+frequency = st.slider('Input frequency (Hz)', min_value=1, max_value=100, value=10)
 input_sample_rate = st.slider('Sample rate (Hz)', min_value=10, max_value=1000, value=200)
 
 num_seconds = 1
