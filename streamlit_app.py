@@ -10,6 +10,13 @@ import pandas as pd
 import streamlit as st
 import altair as alt
 
+hide_decoration_bar_style = '''
+    <style>
+        header {visibility: hidden;}
+    </style>
+'''
+st.markdown(hide_decoration_bar_style, unsafe_allow_html=True)
+
 st.header('Input signal')
 
 frequency = st.slider('Frequency (Hz)', min_value=1, max_value=100, value=10)
