@@ -17,6 +17,14 @@ hide_decoration_bar_style = '''
 '''
 st.markdown(hide_decoration_bar_style, unsafe_allow_html=True)
 
+hide_streamlit_style = """
+<style>
+    #root > div:nth-child(1) > div > div > div > div > section > div {padding-top: 0rem;}
+</style>
+
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+    
 st.header('Aliasing')
 
 frequency = st.slider('Input frequency (Hz)', min_value=1, max_value=100, value=10)
