@@ -10,6 +10,8 @@ import pandas as pd
 import streamlit as st
 import altair as alt
 
+st.set_page_config(layout='wide')
+
 hide_decoration_bar_style = '''
     <style>
         header {visibility: hidden;}
@@ -24,7 +26,7 @@ hide_streamlit_style = """
 
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-    
+   
 st.header('Aliasing')
 
 frequency = st.slider('Input frequency (Hz)', min_value=1, max_value=100, value=10)
