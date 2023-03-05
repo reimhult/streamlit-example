@@ -56,8 +56,8 @@ for sc in spectral_components:
 df_input = pd.DataFrame({'Input signal': input_signal, 'time': time}).rename(columns={'time': 'Time (s)'})
 
 with col2:
-    st.subheader('Plots')
-    input_chart = alt.Chart(df_input, height=200).mark_line().encode(
+    st.subheader('Time plot')
+    input_chart = alt.Chart(df_input, height=150).mark_line().encode(
         x='Time (s)',
         y='Input signal'
     )    
@@ -67,11 +67,12 @@ with col2:
     input_spectrum = np.abs(np.fft.fft(input_signal))[:num_samples//2] / (num_samples//2)
     frequencies = np.fft.fftfreq(num_samples, 1 / input_sample_rate)[:num_samples//2]
     
-    df_spectrum = pd.DataFrame({'Amplitude spectrum': input_spectrum, 'Frequency (Hz)': frequencies})
+    df_spectrum = pd.DataFrame({'Amplitude': input_spectrum, 'Frequency (Hz)': frequencies})
     
-    spectrum_chart = alt.Chart(df_spectrum, height=200).mark_line().encode(
+    st.subheader('Spectrum')
+    spectrum_chart = alt.Chart(df_spectrum, height=150).mark_line().encode(
         x='Frequency (Hz)',
-        y='Amplitude spectrum'
+        y='Amplitude'
     )    
     
     st.altair_chart(spectrum_chart, use_container_width=True)
