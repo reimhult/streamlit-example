@@ -27,10 +27,14 @@ hide_streamlit_style = """
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
    
-st.header('Aliasing')
+st.header('Aliasing demonstration')
 
-frequency = st.slider('Input frequency (Hz)', min_value=1, max_value=100, value=10)
-input_sample_rate = st.slider('Sample rate (Hz)', min_value=10, max_value=1000, value=200)
+col1, col2, col3 = st.columns([1, 3, 1])
+
+with col1:
+    st.subheader('Input')
+    frequency = st.slider('Input frequency (Hz)', min_value=1, max_value=50, value=10)
+    input_sample_rate = st.slider('Sample rate (Hz)', min_value=10, max_value=200, value=200)
 
 num_seconds = 1
 num_samples = num_seconds * input_sample_rate
@@ -51,28 +55,32 @@ for sc in spectral_components:
 
 df_input = pd.DataFrame({'Input signal': input_signal, 'time': time})
 
-input_chart = alt.Chart(df_input).mark_line().encode(
-    x='time',
-    y='Input signal'
-)    
+with col2:
+    st.subheader('Plots')
+    input_chart = alt.Chart(df_input, height=200).mark_line().encode(
+        x='time',
+        y='Input signal'
+    )    
+    
+    st.altair_chart(input_chart, use_container_width=True)
+    
+    input_spectrum = np.abs(np.fft.fft(input_signal))[:num_samples//2] / (num_samples//2)
+    frequencies = np.fft.fftfreq(num_samples, 1 / input_sample_rate)[:num_samples//2]
+    
+    df_spectrum = pd.DataFrame({'Amplitude spectrum': input_spectrum, 'Frequency (Hz)': frequencies})
+    
+    spectrum_chart = alt.Chart(df_spectrum, height=200).mark_line().encode(
+        x='Frequency (Hz)',
+        y='Amplitude spectrum'
+    )    
+    
+    st.altair_chart(spectrum_chart, use_container_width=True)
 
-st.altair_chart(input_chart, use_container_width=True)
-
-input_spectrum = np.abs(np.fft.fft(input_signal))[:num_samples//2] / (num_samples//2)
-frequencies = np.fft.fftfreq(num_samples, 1 / input_sample_rate)[:num_samples//2]
-
-df_spectrum = pd.DataFrame({'Amplitude spectrum': input_spectrum, 'Frequency (Hz)': frequencies})
-
-spectrum_chart = alt.Chart(df_spectrum).mark_line().encode(
-    x='Frequency (Hz)',
-    y='Amplitude spectrum'
-)    
-
-st.altair_chart(spectrum_chart, use_container_width=True)
-
-max_index = np.argmax(input_spectrum)
-det_freq = frequencies[max_index]
-
-st.text(f'Input signal frequency: {frequency:.2f} Hz')
-st.text(f'Detected frequency: {det_freq:.2f} Hz')
-
+with col3:
+    st.subheader('Frequencies')
+    max_index = np.argmax(input_spectrum)
+    det_freq = frequencies[max_index]
+    
+    st.text(f'In:\t{frequency:.2f} Hz')
+    st.text(f'Out:\t{det_freq:.2f} Hz')
+    
